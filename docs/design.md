@@ -198,6 +198,9 @@ IronPythonConsole -> TestEntry  : execute()
                 create TestSystemCallNotifier
                 TestPlantProvider -> TestSystemCallNotifier  :  __init( instance of CsPlusSimulator )
                 return
+                TestPlantProvider -> TestSystemCallNotifier  :  set_notifee( instance of XmlTestLogger )
+                return
+
             return
         return
 
