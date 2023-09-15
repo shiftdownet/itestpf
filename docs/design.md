@@ -117,20 +117,20 @@ TestCaseX -up-> TestPlantProvider
                         <Step number="2">
                             <result>Passed</result>
                             <Message>期待値1を確認する</Message>
-                            <Assert name="Rte_Output_Interface1">
+                            <assert_variable name="Rte_Output_Interface1">
                                 <Format>hex</Format>
                                 <Expect>00 55 AA FF</Expect>
                                 <Actual>00 55 AA FF</Actual>
-                            </Assert>
+                            </assert_variable>
                         </Step>
                         <Step number="3">
                             <result>Failed</result>
                             <Message>期待値2を確認する</Message>
-                            <Assert name="Rte_Output_Interface2">
+                            <assert_variable name="Rte_Output_Interface2">
                                 <Format>dec</Format>
                                 <Expect>65535</Expect>
                                 <Actual>0</Actual>
-                            </Assert>
+                            </assert_variable>
                         </Step>
                     </Steps>
                     <TearDown></TearDown>
@@ -228,10 +228,10 @@ IronPythonConsole -> TestEntry  : execute()
                         TestDriver -> XmlTestLogger : TestPlantProvider.logger.start_step()
                         return
                         TestDriver -> TestCaseX : steps()
-                            TestCaseX -> TestSystemCallNotifier : TestPlantProvider.system.assert( 変数名, 期待値 )
-                                TestSystemCallNotifier -> CsPlusSimulator : assert( 変数名, 期待値 )
+                            TestCaseX -> TestSystemCallNotifier : TestPlantProvider.system.assert_variable( 変数名, 期待値 )
+                                TestSystemCallNotifier -> CsPlusSimulator : assert_variable( 変数名, 期待値 )
                                 return
-                                TestSystemCallNotifier -> XmlTestLogger : assert( 変数名, 期待値 )
+                                TestSystemCallNotifier -> XmlTestLogger : assert_variable( 変数名, 期待値 )
                                 return
                             return
                         return

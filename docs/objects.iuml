@@ -11,7 +11,7 @@ hide @unlinked
 interface Framework.TestPlant.ITestSystem $interface {
     ターゲットシステムを操作するインタフェースを提供します。
     ---
-    + assert( operand1, operand2 ) \n\t テスト対象のコードが正しくふるまったかどうか確認します。
+    + assert_variable( operand1, operand2 ) \n\t テスト対象のコードが正しくふるまったかどうか確認します。
 }
 
 '--[TestSystemDecorator]-------
