@@ -12,8 +12,6 @@ class TestDriver():
 
     def __prepare( self ) -> None:
         TestPlantProvider().setup()
-        self.stream = open("./sample.xml", "w")
-        TestPlantProvider().logger().set_stream( self.stream )
         TestPlantProvider().logger().start_test()
 
     def __execute( self, suites : List[ITestSuite] ) -> None:
@@ -46,8 +44,7 @@ class TestDriver():
 
     def __tear_down( self ) -> None:
         TestPlantProvider().logger().end_test()
-        self.stream.close()
-
+        TestPlantProvider().tear_down()
 
 
 

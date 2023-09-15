@@ -8,7 +8,7 @@ class Suite_Sample1(ITestSuite):
     def name( self ) -> str:
         return "SWE5TST-SUITE-SAMPLE1"
 
-    def description() -> str:
+    def description( self ) -> str:
         return "特記事項無し"
 
     def testcases(self) -> Iterator:# Iterator[ITestCase]: # CPythonは通るが、IronPythonだとエラーになる

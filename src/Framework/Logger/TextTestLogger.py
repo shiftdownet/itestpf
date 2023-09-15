@@ -47,4 +47,4 @@ class TextTestLogger(ITestLogger, ITestSystem):
     #--------------------------------------------------
     def test_variable(self, variable_name, expected_value) -> bool:
         self.stream.write("\t\t\t\tactual : " +variable_name + "\n\t\t\t\texpect : " + str(expected_value) + "\n")
-    
+        return True

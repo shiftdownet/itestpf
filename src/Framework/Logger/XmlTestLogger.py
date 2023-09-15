@@ -42,5 +42,6 @@ class XmlTestLogger(ITestLogger, ITestSystem):
     # ITestSystem
     #--------------------------------------------------
     def test_variable(self, variable_name, expected_value) -> bool:
-        pass
+        return True
+
     

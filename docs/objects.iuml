@@ -72,17 +72,10 @@ interface Framework.Logger.ITestLogger $interface {
 }
 
 '--[TestLogger]-------
-class Framework.Logger.XmlTestLogger implements  Framework.TestPlant.ITestSystem, Framework.Logger.ITestLogger {
-
+class Framework.Logger.YamlTestLogger implements  Framework.TestPlant.ITestSystem, Framework.Logger.ITestLogger {
     ITestSystemを実装しており、
     テストシステムコールのタイミングでもロギングを行います。
 }
-class Framework.Logger.TextTestLogger implements  Framework.TestPlant.ITestSystem, Framework.Logger.ITestLogger {
-
-    ITestSystemを実装しており、
-    テストシステムコールのタイミングでもロギングを行います。
-}
-
 
 '#----------------------------------------------------
 '# TestSpec

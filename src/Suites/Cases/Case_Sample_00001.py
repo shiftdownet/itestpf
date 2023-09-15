@@ -7,7 +7,7 @@ class Case_Sample_00001(ITestCase):
     def name( self ) -> str:
         return "SWE5TST-SAMPLE-00001"
 
-    def description() -> str:
+    def description( self ) -> str:
         return "特記事項無し"
 
     def prepare(self) -> None:
@@ -18,7 +18,8 @@ class Case_Sample_00001(ITestCase):
         yield True
         TestPlantProvider().system().test_variable("VariableB", 5 )
         yield True
-        TestPlantProvider().system().test_variable("VariableB", 10 )
+        TestPlantProvider().system().test_variable("VariableC", 10 )
+        TestPlantProvider().system().test_variable("VariableD", 55 )
         yield False
 
     def tear_down(self) -> None:
