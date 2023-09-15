@@ -2,16 +2,15 @@
 from collections.abc import Iterator
 import abc
 
-class ITestCase(metaclass=abc.ABCMeta):
+class Test():
+    pass
 
-    @abc.abstractmethod
+class ITestCase():
     def prepare(self) -> None:
         raise NotImplementedError()
     
-    @abc.abstractmethod
-    def steps(self) -> Iterator:# Iterator[bool]: # CPythonは通るが、IronPythonだとエラーになる
+    def steps(self) -> Iterator:
         raise NotImplementedError()
     
-    @abc.abstractmethod
     def tear_down(self) -> None:
         raise NotImplementedError()

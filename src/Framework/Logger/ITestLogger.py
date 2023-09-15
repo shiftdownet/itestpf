@@ -1,5 +1,7 @@
 
 import abc
+from Framework.TestSpec.ITestSuite import *
+from Framework.TestSpec.ITestCase import *
 
 class ITestLogger(metaclass=abc.ABCMeta):
 
@@ -16,11 +18,11 @@ class ITestLogger(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def start_suite(self, suite_name: str) -> None:
+    def start_suite(self, suite: ITestSuite ) -> None:
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def start_case(self, case_name: str) -> None:
+    def start_case(self, testcase: ITestCase ) -> None:
         raise NotImplementedError()
 
     @abc.abstractmethod

@@ -20,6 +20,7 @@ export_on_save:             # ファイル保存時の振る舞い
 
 ```plantuml
 !include ./objects.iuml
+scale 0.8
 
 remove TestDriver
 remove TestCaseX
@@ -48,6 +49,7 @@ Framework.Logger.XmlTestLogger - Framework.Logger.ITestSystem_Implements_By
 
 ```plantuml
 !include ./objects.iuml
+scale 0.8
 
 remove TestPlantProvider
 remove Logger
@@ -57,7 +59,7 @@ remove ITestSystem
 remove ITestSystemDecorator
 
 TestEntry "1" -ri-> "*" TestSuiteX : <<create>>\n生成しTestDriverに渡します。
-TestEntry -up-> TestDriver : <<delegate>>\nexecute( テストスイートのインスタンス )\nの形でテストを実行します
+TestEntry -up-> TestDriver : <<delegate>>指定したテストを実行します
 TestDriver -> ITestSuite : <<call>>\n
 ITestSuite "1" *-> "*" ITestCase : <<composite>>\n生成し保持します
 TestSuiteX "1" *-> "*" TestCaseX : <<composite>>\n生成し保持します
@@ -70,6 +72,7 @@ TestDriver -> ITestCase : <<call>> \nITestSuiteから取得したテストケー
 
 ```plantuml
 !include ./objects.iuml
+scale 0.8
 
 remove Logger
 remove TestPlant
@@ -117,20 +120,20 @@ TestCaseX -up-> TestPlantProvider
                         <Step number="2">
                             <result>Passed</result>
                             <Message>期待値1を確認する</Message>
-                            <assert_variable name="Rte_Output_Interface1">
+                            <test_variable name="Rte_Output_Interface1">
                                 <Format>hex</Format>
                                 <Expect>00 55 AA FF</Expect>
                                 <Actual>00 55 AA FF</Actual>
-                            </assert_variable>
+                            </test_variable>
                         </Step>
                         <Step number="3">
                             <result>Failed</result>
                             <Message>期待値2を確認する</Message>
-                            <assert_variable name="Rte_Output_Interface2">
+                            <test_variable name="Rte_Output_Interface2">
                                 <Format>dec</Format>
                                 <Expect>65535</Expect>
                                 <Actual>0</Actual>
-                            </assert_variable>
+                            </test_variable>
                         </Step>
                     </Steps>
                     <TearDown></TearDown>
@@ -146,6 +149,8 @@ TestCaseX -up-> TestPlantProvider
 
 ```plantuml
 !pragma teoz true
+scale 0.8
+
 skinparam SequenceLifeLineBackgroundColor LightSteelBlue
 
 participant IronPythonConsole
@@ -182,7 +187,7 @@ IronPythonConsole -> TestEntry  : execute()
     '#----------------------------------------------------
     TestEntry -> TestDriver  : execute( TestSuiteX[] )
 
-        TestDriver -> TestDriver  : prepare()
+        TestDriver -> TestDriver  : __prepare()
             '#----------------------------------------------------
             '# TestPlantProvider.setup()
             '#----------------------------------------------------
@@ -206,54 +211,58 @@ IronPythonConsole -> TestEntry  : execute()
             return
         return
 
-        TestDriver -> XmlTestLogger  : TestPlantProvider.logger.start_test()
-        return
+        TestDriver -> TestDriver  : __execute( suites )
 
-        loop すべてのテストスイートが実行し終わるまで
-
-            TestDriver -> XmlTestLogger : TestPlantProvider.logger.start_suite( suite_name )
-            return
-            TestDriver -> TestSuiteX  : prepare()
+            TestDriver -> XmlTestLogger  : TestPlantProvider.logger.start_test()
             return
 
-            loop ジェネレータがテストケースを返さなくなるまで
-                TestDriver -> TestSuiteX : testcases()\nテストケースをジェネレータで\n1件づつ取得
+            loop すべてのテストスイートが実行し終わるまで
+
+                TestDriver -> XmlTestLogger : TestPlantProvider.logger.start_suite( suite )
                 return
-                TestDriver -> TestDriver : execute_testcase( testcase )
-                    TestDriver -> XmlTestLogger : TestPlantProvider.logger.start_case( case_name )
+
+                TestDriver -> TestSuiteX  : prepare()
+                return
+
+                loop ジェネレータがテストケースを返さなくなるまで
+                    TestDriver -> TestSuiteX : testcases()\nテストケースをジェネレータで\n1件づつ取得
+                    return
+                    TestDriver -> XmlTestLogger : TestPlantProvider.logger.start_case( testcase )
                     return
                     TestDriver -> TestCaseX : prepare()
                     return
+
                     loop ジェネレータがテストステップを返さなくなるまで
                         TestDriver -> XmlTestLogger : TestPlantProvider.logger.start_step()
                         return
                         TestDriver -> TestCaseX : steps()
-                            TestCaseX -> TestSystemCallNotifier : TestPlantProvider.system.assert_variable( 変数名, 期待値 )
-                                TestSystemCallNotifier -> CsPlusSimulator : assert_variable( 変数名, 期待値 )
+                            TestCaseX -> TestSystemCallNotifier : TestPlantProvider.system.test_variable( 変数名, 期待値 )
+                                TestSystemCallNotifier -> CsPlusSimulator : test_variable( 変数名, 期待値 )
                                 return
-                                TestSystemCallNotifier -> XmlTestLogger : assert_variable( 変数名, 期待値 )
+                                TestSystemCallNotifier -> XmlTestLogger : test_variable( 変数名, 期待値 )
                                 return
                             return
                         return
                         TestDriver -> XmlTestLogger : TestPlantProvider.logger.end_step()
                         return
                     end loop
+
                     TestDriver -> TestCaseX : tear_down()
                     return
-                    TestDriver -> XmlTestLogger : TestPlantProvider.logger.end_case( case_name )
+                    TestDriver -> XmlTestLogger : TestPlantProvider.logger.end_case( testcase )
                     return
+
+                end loop
+
+                TestDriver -> TestSuiteX  : tear_down()
                 return
 
+                TestDriver -> XmlTestLogger : TestPlantProvider.logger.end_suite( suite )
+                return
             end loop
+        return
 
-            TestDriver -> TestSuiteX  : tear_down()
-            return
-
-            TestDriver -> XmlTestLogger : TestPlantProvider.logger.end_suite( suite_name )
-            return
-        end loop
-
-        TestDriver -> TestDriver  : tear_down()
+        TestDriver -> TestDriver  : __tear_down()
             TestDriver -> XmlTestLogger  : TestPlantProvider.logger.end_test()
             return
             hnote over TestDriver : ファイルクローズ
