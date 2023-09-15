@@ -183,13 +183,12 @@ IronPythonConsole -> TestEntry  : execute()
     TestEntry -> TestDriver  : execute( TestSuiteX[] )
 
         TestDriver -> TestDriver  : prepare()
-            hnote over TestDriver : ファイルオープン
             '#----------------------------------------------------
             '# TestPlantProvider.setup()
             '#----------------------------------------------------
             TestDriver -> TestPlantProvider  : setup()
                 create XmlTestLogger
-                TestPlantProvider -> XmlTestLogger  : set_stream( stream )
+                TestPlantProvider -> XmlTestLogger  : __init()
                 return
                
                 create CsPlusSimulator
@@ -200,7 +199,10 @@ IronPythonConsole -> TestEntry  : execute()
                 return
                 TestPlantProvider -> TestSystemCallNotifier  :  set_notifee( instance of XmlTestLogger )
                 return
+            return
 
+            hnote over TestDriver : ファイルオープン
+            TestDriver -> XmlTestLogger  : TestPlantProvider.logger.set_stream( stream )
             return
         return
 
