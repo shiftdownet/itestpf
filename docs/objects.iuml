@@ -1,0 +1,128 @@
+@startuml
+hide @unlinked
+
+'#==============================================================================================
+'# Framework
+'#==============================================================================================
+'#----------------------------------------------------
+'# TestPlant
+'#----------------------------------------------------
+'--[ITestSystem]-------
+interface Framework.TestPlant.ITestSystem $interface {
+    ターゲットシステムを操作するインタフェースを提供します。
+    ---
+    + assert( operand1, operand2 ) \n\t テスト対象のコードが正しくふるまったかどうか確認します。
+}
+
+'--[TestSystemDecorator]-------
+abstract Framework.TestPlant.TestSystemDecorator $abstract implements Framework.TestPlant.ITestSystem {
+    ITargetSystemのデコレータです。
+    コンストラクタ引数にデコレーティを受け取ります。
+    ---
+    + __init__( decoratee : ITestSystem )
+    - decoratee : ITestSystem
+}
+
+'--[CsPlusSimulator]-------
+class Framework.TestPlant.CsPlusSimulator implements Framework.TestPlant.ITestSystem {
+    テストシステムの具現クラスです。
+}
+
+'--[TestSystemCallNotifier]-------
+class Framework.TestPlant.TestSystemCallNotifier implements Framework.TestPlant.TestSystemDecorator {
+    デコレートするテストシステムのコールを行った上で、
+    Notifeeに通知します。
+    ---
+    + __init__( decoratee : ITestSystem )
+    + set_notifee( notifee : ITestSystem )
+    - notifee : ITestSystem
+}
+
+'--[TestPlantProvider]-------
+class Framework.TestPlantProvider <<(S,skyblue) singleton>> {
+    テストプラントを提供します。
+    ターゲットシステムは同時に複数接続できないため、
+    シングルトンとして実装されます。
+    ---
+    + setup() \n\t Providerのセットアップを行います。
+    + system() : ITestSystem \n\t テストシステムを操作するためのインタフェースを返します。
+    + logger() : TestLogger \n\t ロギングのためのインタフェースを返します。
+}
+
+'#----------------------------------------------------
+'# Logger
+'#----------------------------------------------------
+'--[StateLogger]-------
+interface Framework.Logger.ITestLogger $interface {
+    テストロギングを行うインタフェースです。
+    ----
+    + set_stream( stream ) \n\t ログ出力先のストリームを指定してください。
+    + log( message : string ) \n\t 任意の文字列をロギングしたい際にコールしてください。
+    + start_test() \n\t テストの開始時にコールしてください。
+    + start_suite( suite_name : string ) \n\t テストスイートの開始時にコールしてください。
+    + start_case( case_name : string ) \n\t テストケースの開始時にコールしてください。
+    + start_step() \n\t テストステップの開始時にコールしてください。
+    + end_step() \n\t テストの終了時にコールしてください。
+    + end_case() \n\t テストスイートの終了時にコールしてください。
+    + end_suite() \n\t テストケースの終了時にコールしてください。
+    + end_test() \n\t テストステップの終了時にコールしてください。
+}
+
+'--[TestLogger]-------
+class Framework.Logger.XmlTestLogger implements  Framework.TestPlant.ITestSystem, Framework.Logger.ITestLogger {
+
+    ITestSystemを実装しており、
+    テストシステムコールのタイミングでもロギングを行います。
+}
+
+
+'#----------------------------------------------------
+'# TestSpec
+'#----------------------------------------------------
+
+interface Framework.TestSpec.ITestSuite $interface {
+    + testcases() \n\t テストケースを生成し返すジェネレータです。
+    + prepare() \n\t テストスイートの前処理を実施します
+    + tear_down() \n\t テストスイートの後処理を実施します
+}
+
+interface Framework.TestSpec.ITestCase $interface {
+    + prepare() \n\t テストケースの前処理を実施します
+    + steps() : boolean \n\t テストステップを実行します。\n\t ジェネレータとして実行してください。\n\t Falseを返すとテストケースを終了します。
+    + tear_down() \n\t テストケースの後処理を実施します
+}
+
+class  Framework.TestDriver {
+    テストプラントの初期化と、
+    登録されたテストスイートの実行を担います。
+    ----
+    + execute( test_suites : ITestSuite[] ) \n\t 指定されたテストスイート群を実行します。
+}
+
+'#==============================================================================================
+'# User Test Scripts
+'#==============================================================================================
+
+class TestEntry {
+    テストのエントリポイントです。
+    本クラスのexecuteをコールすることで
+    テストが開始します。
+    ---
+    + execute() \n\t すべてのテストを実行します。
+}
+
+class TestSuiteX implements Framework.TestSpec.ITestSuite {
+    具体的なテストスイートです。
+    テストスイートの数だけクラスを作成してください。
+    ITestSuiteを実装することで、
+    TestDriverからの実行が可能になります。
+}
+
+class TestCaseX implements Framework.TestSpec.ITestCase {
+    具体的なテストケースです。
+    テストケースの数だけクラスを作成してください。
+    ITestSuiteを実装することで、
+    TestDriverからの実行が可能になります。
+}
+
+@enduml
