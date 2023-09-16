@@ -4,13 +4,18 @@ test:
       name: "SWE5TST-SUITE-SAMPLE1"
       description: "特記事項無し"
       test_cases:
+        # preparing...
+        # finished
         -
           name: "SWE5TST-SAMPLE-00001"
           description: "特記事項無し"
           steps:
+            # preparing...
+            # finished
             -
               number: 1
               commands:
+                # Any log.
                 -
                   command: "test_variable"
                   actual: "VariableA"
@@ -33,13 +38,18 @@ test:
                   command: "test_variable"
                   actual: "VariableD"
                   expect: 55
+            # tear down...
+            # finished
         -
           name: "SWE5TST-SAMPLE-00001"
           description: "特記事項無し"
           steps:
+            # preparing...
+            # finished
             -
               number: 1
               commands:
+                # Any log.
                 -
                   command: "test_variable"
                   actual: "VariableA"
@@ -62,3 +72,7 @@ test:
                   command: "test_variable"
                   actual: "VariableD"
                   expect: 55
+            # tear down...
+            # finished
+        # tear_down...
+        # finished

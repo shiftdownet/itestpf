@@ -15,7 +15,7 @@ class YamlTestLogger(ITestLogger, ITestSystem):
         self.nest = 0
 
     def log(self, message: str) -> None:
-        self.stream.write( message )
+        self.stream.write( self.__format("# " + message) )
 
     def start_test(self) -> None:
         self.stream.write( self.__format("test:") )
@@ -49,20 +49,16 @@ class YamlTestLogger(ITestLogger, ITestSystem):
         self.nest+=1
 
     def end_step(self) -> None:
-        self.nest-=1
-        self.nest-=1
+        self.nest-=2
 
     def end_case(self) -> None:
-        self.nest-=1
-        self.nest-=1
+        self.nest-=2
 
     def end_suite(self) -> None:
-        self.nest-=1
-        self.nest-=1
+        self.nest-=2
 
     def end_test(self) -> None:
-        self.nest-=1
-        self.nest-=1
+        self.nest-=2
 
     #--------------------------------------------------
     # ITestSystem

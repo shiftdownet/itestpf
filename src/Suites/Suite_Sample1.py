@@ -16,7 +16,10 @@ class Suite_Sample1(ITestSuite):
         yield Case_Sample_00001()
 
     def prepare(self) -> None:
-        pass
+        TestPlantProvider().logger().log("preparing...")
+        TestPlantProvider().logger().log("finished")
 
     def tear_down(self) -> None:
-        pass
+        TestPlantProvider().logger().log("tear_down...")
+        TestPlantProvider().logger().log("finished")
+

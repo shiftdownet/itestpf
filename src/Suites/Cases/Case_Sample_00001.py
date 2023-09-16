@@ -11,9 +11,12 @@ class Case_Sample_00001(ITestCase):
         return "特記事項無し"
 
     def prepare(self) -> None:
-        pass
+        TestPlantProvider().logger().log("preparing...")
+        TestPlantProvider().logger().log("finished")
+
     
     def steps(self) -> Iterator:# Iterator[bool]: # CPythonは通るが、IronPythonだとエラーになる
+        TestPlantProvider().logger().log("Any log.")
         TestPlantProvider().system().test_variable("VariableA", 0 )
         yield True
         TestPlantProvider().system().test_variable("VariableB", 5 )
@@ -23,4 +26,5 @@ class Case_Sample_00001(ITestCase):
         yield False
 
     def tear_down(self) -> None:
-        pass
+        TestPlantProvider().logger().log("tear down...")
+        TestPlantProvider().logger().log("finished")
