@@ -1,9 +1,9 @@
 
 
-from Framework.TestPlant.ITestSystem import *
-from Framework.Logger.ITestLogger import *
-from Framework.TestSpec.ITestSuite import *
-from Framework.TestSpec.ITestCase import *
+from Framework.TestPlant.ITestSystem import ITestSystem
+from Framework.Logger.ITestLogger import ITestLogger
+from Framework.TestSpec.ITestSuite import ITestSuite
+from Framework.TestSpec.ITestCase import ITestCase
 
 class TextTestLogger(ITestLogger, ITestSystem):
     #--------------------------------------------------
@@ -22,7 +22,7 @@ class TextTestLogger(ITestLogger, ITestSystem):
     def start_suite(self, suite: ITestSuite) -> None:
         self.stream.write( "\tTestSuite : " + suite.name() + "\n" )
 
-    def start_case(self, testcase: ITestLogger) -> None:
+    def start_case(self, testcase: ITestCase) -> None:
         self.stream.write( "\t\tTestCase : " + testcase.name() + "\n" )
         self.step_no = 0
 

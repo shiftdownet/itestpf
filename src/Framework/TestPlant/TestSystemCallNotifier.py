@@ -1,6 +1,8 @@
 
 
-from Framework.TestPlant.TestSystemDecorator import *
+from Framework.TestPlant.TestSystemDecorator import TestSystemDecorator
+from Framework.TestPlant.ITestSystem import ITestSystem
+
 
 class TestSystemCallNotifier(TestSystemDecorator):
 

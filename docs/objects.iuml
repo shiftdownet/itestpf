@@ -10,7 +10,7 @@ hide @unlinked
 interface Framework.TestPlant.ITestSystem $interface {
     ターゲットシステムを操作するインタフェースを提供します。
     ---
-    + test_variable( operand1, operand2 ) \n\t テスト対象のコードが正しくふるまったかどうか確認します。
+    + test_variable( variable_name, expected_value ) \n\t テスト対象のコードが正しくふるまったかどうか確認します。
 }
 
 '--[TestSystemDecorator]-------
@@ -22,13 +22,17 @@ abstract Framework.TestPlant.TestSystemDecorator $abstract implements Framework.
     - decoratee : ITestSystem
 }
 
-'--[CsPlusSimulator]-------
-class Framework.TestPlant.CsPlusSimulator implements Framework.TestPlant.ITestSystem {
+'--[ConcreteTestSystem]-------
+class Framework.TestPlant.ConcreteTestSystem implements Framework.TestPlant.ITestSystem {
     テストシステムの具現クラスです。
-}
-class Framework.TestPlant.MockSimulator implements Framework.TestPlant.ITestSystem {
-    テストシステムの具現クラスです。
-    ※デバッグ用で実際には\nテストシステムには接続しない
+    以下のようなテストシステムを想定しています。
+    * MockSimulator
+        テストフレームワークのデバッグに使う
+        仮想のシミュレータです。
+    * CsPlusSimulator
+        CS+のシミュレータ環境です。
+    * GhsSimulator
+        GHSのシミュレータ環境です。
 }
 
 '--[TestSystemCallNotifier]-------
@@ -48,8 +52,9 @@ class Framework.TestPlantProvider <<(S,skyblue) singleton>> {
     シングルトンとして実装されます。
     ---
     + setup() \n\t Providerのセットアップを行います。
-    + system() : ITestSystem \n\t テストシステムを操作するためのインタフェースを返します。
-    + logger() : TestLogger \n\t ロギングのためのインタフェースを返します。
+    + system() : ITestSystem \n\t テストシステムを返します。
+    + logger() : ITestLogger \n\t ロガーを返します。
+    + tear_down() \n\t Providerを終了します。
 }
 
 '#----------------------------------------------------
@@ -72,9 +77,14 @@ interface Framework.Logger.ITestLogger $interface {
 }
 
 '--[TestLogger]-------
-class Framework.Logger.YamlTestLogger implements  Framework.TestPlant.ITestSystem, Framework.Logger.ITestLogger {
-    ITestSystemを実装しており、
-    テストシステムコールのタイミングでもロギングを行います。
+class Framework.Logger.ConcreteTestLogger implements  Framework.TestPlant.ITestSystem, Framework.Logger.ITestLogger {
+    ITestLoggerの具現クラスです。
+    下記のような具現クラスを想定しています。
+    * XmlTestLogger
+    * YamlTestLogger
+    * TextTestLogger
+    * JsonTestLogger
+    ITestSystemを実装しているため\nテストシステムコールのタイミングでもロギングを行えます。
 }
 
 '#----------------------------------------------------
@@ -101,19 +111,30 @@ class  Framework.TestDriver {
     テストプラントの初期化と、
     登録されたテストスイートの実行を担います。
     ----
-    + execute( test_suites : List[ITestSuite] ) \n\t 指定されたテストスイート群を実行します。
+    + launch( project : ITestProject ) \n\t 指定したテストプロジェクトを実行します。
+}
+
+interface Framework.ITestProject $interface {
+    テストのプロジェクトファイルのインタフェースです。
+    具現クラスのインスタンスをTestDriver.launchに渡しコールすることで
+    一連のテストが実行されます。
+    ---
+    + logger() -> ITestLogger \n\t ロガーを指定します。
+    + log_filename() -> str: \n\t ログファイル名を指定します。
+    + log_encoding() -> str: \n\t ログファイルエンコーディングを指定します。
+    + test_system() -> ITestSystem: \n\t テストシステムを指定します。
+    + suites() -> Iterator: \n\t 実行するスイートのイテレータジェネレータを指定します。
 }
 
 '#==============================================================================================
 '# User Test Scripts
 '#==============================================================================================
 
-class TestEntry {
-    テストのエントリポイントです。
-    本クラスのexecuteをコールすることで
-    テストが開始します。
+class TestProject_A implements Framework.ITestProject {
+    テストのプロジェクトファイルです。
+    本クラスのインスタンスをTestDriver.launchに渡しコールすることで
+    一連のテストが実行されます。
     ---
-    + execute() \n\t すべてのテストを実行します。
 }
 
 class Suites.TestSuiteX implements Framework.TestSpec.ITestSuite {

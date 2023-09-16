@@ -1,9 +1,9 @@
 
 
-from Framework.TestPlant.ITestSystem import *
-from Framework.Logger.ITestLogger import *
-from Framework.TestSpec.ITestSuite import *
-from Framework.TestSpec.ITestCase import *
+from Framework.TestPlant.ITestSystem import ITestSystem
+from Framework.Logger.ITestLogger import ITestLogger
+from Framework.TestSpec.ITestSuite import ITestSuite
+from Framework.TestSpec.ITestCase import ITestCase
 
 class YamlTestLogger(ITestLogger, ITestSystem):
     #--------------------------------------------------
@@ -31,7 +31,7 @@ class YamlTestLogger(ITestLogger, ITestSystem):
         self.stream.write( self.__format("test_cases:") )
         self.nest+=1
 
-    def start_case(self, testcase: ITestLogger) -> None:
+    def start_case(self, testcase: ITestCase) -> None:
         self.stream.write( self.__format("-") )
         self.nest+=1
         self.stream.write( self.__format("name: " + self.__dq(testcase.name())) )

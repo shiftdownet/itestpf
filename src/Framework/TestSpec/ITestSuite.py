@@ -1,7 +1,7 @@
 
 import abc
 from collections.abc import Iterator
-from Framework.TestSpec.ITestCase import *
+#from Framework.TestSpec.ITestCase import ITestCase
 
 class ITestSuite(metaclass=abc.ABCMeta):
 

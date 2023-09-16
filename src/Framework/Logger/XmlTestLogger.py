@@ -1,8 +1,8 @@
 
-from Framework.TestPlant.ITestSystem import *
-from Framework.Logger.ITestLogger import *
-from Framework.TestSpec.ITestSuite import *
-from Framework.TestSpec.ITestCase import *
+from Framework.TestPlant.ITestSystem import ITestSystem
+from Framework.Logger.ITestLogger import ITestLogger
+from Framework.TestSpec.ITestSuite import ITestSuite
+from Framework.TestSpec.ITestCase import ITestCase
 
 class XmlTestLogger(ITestLogger, ITestSystem):
     #--------------------------------------------------
@@ -20,7 +20,7 @@ class XmlTestLogger(ITestLogger, ITestSystem):
     def start_suite(self, suite: ITestSuite) -> None:
         pass
 
-    def start_case(self, testcase: ITestLogger) -> None:
+    def start_case(self, testcase: ITestCase) -> None:
         pass
 
     def start_step(self) -> None:

@@ -15,7 +15,47 @@ export_on_save:             # ファイル保存時の振る舞い
 
 
 
-# 1. テストプラント
+# 1. フレームワークとユーザスクリプトの境界仕様
+
+
+```plantuml
+!include ./objects.iuml
+scale 0.8
+
+remove Logger
+remove TestPlant
+remove ITestLogger
+remove ITestSystem
+remove ITestSystemDecorator
+
+
+TestProject_A -up[hidden] ITestProject
+
+class TestEntry <<E, limegreen>> {
+    エントリポイントです。\n実装はTestProject_Aモジュールに含まれています。
+}
+
+TestDriver -le[hidden] TestEntry
+TestDriver -do[hidden]- ITestProject
+ITestProject -ri[hidden] TestPlantProvider
+ITestCase -do[hidden]- ITestSuite
+
+TestProject_A "1" -ri-> "*" TestSuiteX : <<create>>\nsuitesジェネレータ内\nで生成します。
+TestEntry -do-> TestProject_A : <<create>>生成します。
+TestEntry -up---> TestDriver : <<use>>\n生成したTestProjectを渡して\nテストを実行します。
+
+TestDriver -> ITestSuite : <<call>>\nテストの準備・終了、及び\ntestcasesメソッドより\n実行対象のテストケースを取得します。
+TestDriver -> ITestCase : <<call>> \nITestSuiteから取得したテストケースを\n順番に実行します。
+TestDriver -do> TestPlantProvider : <<use>>\nテストプラントの操作や\nロギングを行います。
+TestDriver -do-> ITestProject : <<use>>\n実行対象のテストスイートを取得します。
+
+TestSuiteX "1" *-ri-> "*" TestCaseX : <<composite>>\ntestcasesジェネレータ内\nで生成します。
+TestSuiteX -up> TestPlantProvider : <<use>>\nテストプラントの操作や\nロギングを行います。
+TestCaseX -up> TestPlantProvider : <<use>>\nテストプラントの操作や\nロギングを行います。
+
+
+```
+# 2. フレームワーク内部(TestPlantProvider)の詳細
 
 
 ```plantuml
@@ -28,9 +68,9 @@ remove TestSuiteX
 remove TestSpec
 
 'skinparam groupInheritance 2
-Framework.Logger.YamlTestLogger -up[hidden]-- ITestLogger
-Framework.TestPlantProvider *-up-> Framework.Logger.YamlTestLogger : <<composite>>\n生成し保持します
-Framework.TestPlantProvider -up.> Framework.TestPlant.CsPlusSimulator : <<create>>\n生成しデコレータに渡します。
+Framework.Logger.ConcreteTestLogger -up[hidden]-- ITestLogger
+Framework.TestPlantProvider *-up-> Framework.Logger.ConcreteTestLogger : <<composite>>\nITestProjectの情報に基づき\n生成し保持します
+Framework.TestPlantProvider -up.> Framework.TestPlant.ConcreteTestSystem : <<create>>\nITestProjectの情報に基づき\n生成しデコレータに渡します。
 Framework.TestPlantProvider *-up-> Framework.TestPlant.TestSystemCallNotifier : <<composite>>\n生成し保持します
 Framework.TestPlant.TestSystemCallNotifier o-up- Framework.TestPlant.ITestSystem : <<aggregate>>\nコンストラクタで受け取った\nインスタンスを保有します
 
@@ -38,57 +78,17 @@ Framework.TestPlant.TestSystemCallNotifier o-up- Framework.TestPlant.ITestSystem
 circle "ITestSystem" as Framework.Logger.ITestSystem_Implements_By
 
 Framework.TestPlant.TestSystemCallNotifier -( Framework.Logger.ITestSystem_Implements_By : <<notify>>\nテストシステムの\nコールを通知します
-Framework.Logger.YamlTestLogger - Framework.Logger.ITestSystem_Implements_By
+Framework.Logger.ConcreteTestLogger - Framework.Logger.ITestSystem_Implements_By
 
+Framework.TestPlantProvider -> Framework.ITestProject : <<use>>\nコンフィグ情報を使用し\nプロバイダを構築します。
 
-```
-
-
-# 2. テスト仕様の構成
-
-
-```plantuml
-!include ./objects.iuml
-scale 0.8
-
-remove TestPlantProvider
-remove Logger
-remove TestPlant
-remove ITestLogger
-remove ITestSystem
-remove ITestSystemDecorator
-
-TestEntry "1" -ri-> "*" TestSuiteX : <<create>>\n生成しTestDriverに渡します。
-TestEntry -up-> TestDriver : <<delegate>>指定したテストを実行します
-TestDriver -> ITestSuite : <<call>>\n
-ITestSuite "1" *-> "*" ITestCase : <<composite>>\n生成し保持します
-TestSuiteX "1" *-> "*" TestCaseX : <<composite>>\n生成し保持します
-
-TestDriver -> ITestCase : <<call>> \nITestSuiteから取得したテストケースを\n順番に実行します。
+TestPlantProvider --() 本プロバイダからテストプラントを操作します
 
 ```
 
-# 3. テスト仕様とテストプラントの関係
-
-```plantuml
-!include ./objects.iuml
-scale 0.8
-
-remove Logger
-remove TestPlant
-remove $interface
-remove $abstract
 
 
-TestDriver -> TestPlantProvider
-
-TestSuiteX -up-> TestPlantProvider
-TestCaseX -up-> TestPlantProvider
-
-
-```
-
-# 4. 実行シーケンス
+# 3. 実行シーケンス
 
 ```plantuml
 !pragma teoz true
@@ -98,69 +98,79 @@ skinparam SequenceLifeLineBackgroundColor LightSteelBlue
 
 participant IronPythonConsole
 
-participant TestEntry
+participant "TestEntry\n※TestProject_Aに含まれる" as TestEntry
+participant TestProject_A
+participant TestSuiteX
+participant TestCaseX
 box Framework
     participant TestDriver
     box Logger
-        participant YamlTestLogger
+        participant ConcreteTestLogger
     endbox
     box TestPlant
-        participant CsPlusSimulator
+        participant ConcreteTestSystem
         participant TestSystemCallNotifier
         participant TestPlantProvider
     endbox
 endbox
 
-participant TestSuiteX
-participant TestCaseX
 
 autoactivate on
 
 activate IronPythonConsole
 
-IronPythonConsole -> TestEntry  : execute()
+IronPythonConsole -> TestEntry  : Source(TestProject_A)
 
-    create TestSuiteX
-    TestEntry -> TestSuiteX  : __init()\n ※スイート数だけ生成
+    create TestProject_A
+    TestEntry -> TestProject_A  : __init()
     return
 
 
     '#----------------------------------------------------
-    '# TestDriver.execute()
+    '# TestDriver.launch()
     '#----------------------------------------------------
-    TestEntry -> TestDriver  : execute( TestSuiteX[] )
+    TestEntry -> TestDriver  : launch( instance of TestProject_A )
 
         TestDriver -> TestDriver  : __prepare()
             '#----------------------------------------------------
             '# TestPlantProvider.setup()
             '#----------------------------------------------------
             TestDriver -> TestPlantProvider  : setup()
-                create YamlTestLogger
-                TestPlantProvider -> YamlTestLogger  : __init()
-                return
-               
-                create CsPlusSimulator
-                TestPlantProvider -> CsPlusSimulator  : __init()
-                return
+                TestPlantProvider -> TestProject_A : logger()
+                    create ConcreteTestLogger
+                    TestProject_A -> ConcreteTestLogger  : __init()
+                    return
+                return instance of ConcreteTestLogger
+
+                TestPlantProvider -> TestProject_A : test_system()
+                    create ConcreteTestSystem
+                    TestProject_A -> ConcreteTestSystem  : __init()
+                    return
+                return instance of ConcreteTestSystem
+
                 create TestSystemCallNotifier
-                TestPlantProvider -> TestSystemCallNotifier  :  __init( instance of CsPlusSimulator )
+                TestPlantProvider -> TestSystemCallNotifier  :  __init( instance of ConcreteTestSystem )
                 return
-                TestPlantProvider -> TestSystemCallNotifier  :  set_notifee( instance of YamlTestLogger )
+                TestPlantProvider -> TestSystemCallNotifier  :  set_notifee( instance of ConcreteTestLogger )
                 return
+                TestPlantProvider -> TestProject_A : log_filename()\nlog_encoding()
+                return ファイル名, フファイルエンコーディング
                 hnote over TestPlantProvider : ファイルオープン
-                TestPlantProvider -> YamlTestLogger  : set_stream( stream )
+                TestPlantProvider -> ConcreteTestLogger  : set_stream( stream )
                 return
             return
         return
 
-        TestDriver -> TestDriver  : __execute( suites )
+        TestDriver -> TestDriver  : __execute()
 
-            TestDriver -> YamlTestLogger  : TestPlantProvider.logger.start_test()
+            TestDriver -> ConcreteTestLogger  : TestPlantProvider.logger.start_test()
             return
 
-            loop すべてのテストスイートが実行し終わるまで
+            loop ジェネレータがテストスイートを返さなくなるまで
+                TestDriver -> TestProject_A : suites()\nテストスイートをジェネレータで\n1件づつ取得
+                return
 
-                TestDriver -> YamlTestLogger : TestPlantProvider.logger.start_suite( suite )
+                TestDriver -> ConcreteTestLogger : TestPlantProvider.logger.start_suite( suite )
                 return
 
                 TestDriver -> TestSuiteX  : prepare()
@@ -169,29 +179,31 @@ IronPythonConsole -> TestEntry  : execute()
                 loop ジェネレータがテストケースを返さなくなるまで
                     TestDriver -> TestSuiteX : testcases()\nテストケースをジェネレータで\n1件づつ取得
                     return
-                    TestDriver -> YamlTestLogger : TestPlantProvider.logger.start_case( testcase )
+                    TestDriver -> ConcreteTestLogger : TestPlantProvider.logger.start_case( testcase )
                     return
                     TestDriver -> TestCaseX : prepare()
                     return
 
                     loop ジェネレータがテストステップを返さなくなるまで
-                        TestDriver -> YamlTestLogger : TestPlantProvider.logger.start_step()
+                        TestDriver -> ConcreteTestLogger : TestPlantProvider.logger.start_step()
                         return
                         TestDriver -> TestCaseX : steps()
-                            TestCaseX -> TestSystemCallNotifier : TestPlantProvider.system.test_variable( 変数名, 期待値 )
-                                TestSystemCallNotifier -> CsPlusSimulator : test_variable( 変数名, 期待値 )
+                            group example ステップの実行例
+                                TestCaseX -> TestSystemCallNotifier : TestPlantProvider.system.test_variable( 変数名, 期待値 )
+                                    TestSystemCallNotifier -> ConcreteTestSystem : test_variable( 変数名, 期待値 )
+                                    return
+                                    TestSystemCallNotifier -> ConcreteTestLogger : test_variable( 変数名, 期待値 )
+                                    return
                                 return
-                                TestSystemCallNotifier -> YamlTestLogger : test_variable( 変数名, 期待値 )
-                                return
-                            return
+                            end
                         return
-                        TestDriver -> YamlTestLogger : TestPlantProvider.logger.end_step()
+                        TestDriver -> ConcreteTestLogger : TestPlantProvider.logger.end_step()
                         return
                     end loop
 
                     TestDriver -> TestCaseX : tear_down()
                     return
-                    TestDriver -> YamlTestLogger : TestPlantProvider.logger.end_case( testcase )
+                    TestDriver -> ConcreteTestLogger : TestPlantProvider.logger.end_case( testcase )
                     return
 
                 end loop
@@ -199,13 +211,13 @@ IronPythonConsole -> TestEntry  : execute()
                 TestDriver -> TestSuiteX  : tear_down()
                 return
 
-                TestDriver -> YamlTestLogger : TestPlantProvider.logger.end_suite( suite )
+                TestDriver -> ConcreteTestLogger : TestPlantProvider.logger.end_suite( suite )
                 return
             end loop
         return
 
         TestDriver -> TestDriver  : __tear_down()
-            TestDriver -> YamlTestLogger  : TestPlantProvider.logger.end_test()
+            TestDriver -> ConcreteTestLogger  : TestPlantProvider.logger.end_test()
             return
             TestDriver -> TestPlantProvider : tear_down()
                 hnote over TestPlantProvider : ファイルクローズ

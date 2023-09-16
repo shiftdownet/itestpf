@@ -1,6 +1,6 @@
 
 
-from Framework.TestPlant.ITestSystem import *
+from Framework.TestPlant.ITestSystem import ITestSystem
 
 class MockSimulator(ITestSystem):
 
