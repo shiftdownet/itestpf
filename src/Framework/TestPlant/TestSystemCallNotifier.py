@@ -17,3 +17,7 @@ class TestSystemCallNotifier(TestSystemDecorator):
         test_result = self.decoratee.test_variable( variable_name, expected_value )
         return test_result
 
+    def get_value_by( self, variable_name : str ):
+        self.__notifee.get_value_by( variable_name )
+        test_result = self.decoratee.get_value_by( variable_name )
+        return test_result

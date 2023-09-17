@@ -1,0 +1,173 @@
+Test start at 2023-09-17 22:03:18.306000
+	TestSuite : SWE5TST-SUITE-SAMPLE1 start at 2023-09-17 22:03:18.329000
+		log : preparing...
+		log : finished
+		TestCase : SWE5TST-SAMPLE-00001 start at 2023-09-17 22:03:18.332000
+			log : preparing...
+			log : finished
+			Step No : 1
+				log : Any log.
+				test variable : VariableA
+					result : Passed
+					actual : 0
+					expect : 0
+				result of test step : Passed
+					Passed : 1
+					Failed : 0
+			Step No : 2
+				test variable : VariableB
+					result : Failed
+					actual : 0
+					expect : 5
+				result of test step : Failed
+					Passed : 0
+					Failed : 1
+			Step No : 3
+				test variable : VariableC
+					result : Failed
+					actual : 0
+					expect : 10
+				test variable : VariableD
+					result : Failed
+					actual : 0
+					expect : 55
+				result of test step : Failed
+					Passed : 0
+					Failed : 2
+			log : tear down...
+			log : finished
+			result of test case : Failed
+				Passed : 1
+				Failed : 2
+		TestCase : SWE5TST-SAMPLE-00001 start at 2023-09-17 22:03:18.346000
+			log : preparing...
+			log : finished
+			Step No : 1
+				log : Any log.
+				test variable : VariableA
+					result : Passed
+					actual : 0
+					expect : 0
+				result of test step : Passed
+					Passed : 1
+					Failed : 0
+			Step No : 2
+				test variable : VariableB
+					result : Failed
+					actual : 0
+					expect : 5
+				result of test step : Failed
+					Passed : 0
+					Failed : 1
+			Step No : 3
+				test variable : VariableC
+					result : Failed
+					actual : 0
+					expect : 10
+				test variable : VariableD
+					result : Failed
+					actual : 0
+					expect : 55
+				result of test step : Failed
+					Passed : 0
+					Failed : 2
+			log : tear down...
+			log : finished
+			result of test case : Failed
+				Passed : 1
+				Failed : 2
+		log : tear_down...
+		log : finished
+		result of test suite : Failed
+			Passed : 0
+			Failed : 2
+	TestSuite : SWE5TST-SUITE-SAMPLE1 start at 2023-09-17 22:03:18.349000
+		log : preparing...
+		log : finished
+		TestCase : SWE5TST-SAMPLE-00001 start at 2023-09-17 22:03:18.349000
+			log : preparing...
+			log : finished
+			Step No : 1
+				log : Any log.
+				test variable : VariableA
+					result : Passed
+					actual : 0
+					expect : 0
+				result of test step : Passed
+					Passed : 1
+					Failed : 0
+			Step No : 2
+				test variable : VariableB
+					result : Failed
+					actual : 0
+					expect : 5
+				result of test step : Failed
+					Passed : 0
+					Failed : 1
+			Step No : 3
+				test variable : VariableC
+					result : Failed
+					actual : 0
+					expect : 10
+				test variable : VariableD
+					result : Failed
+					actual : 0
+					expect : 55
+				result of test step : Failed
+					Passed : 0
+					Failed : 2
+			log : tear down...
+			log : finished
+			result of test case : Failed
+				Passed : 1
+				Failed : 2
+		TestCase : SWE5TST-SAMPLE-00001 start at 2023-09-17 22:03:18.351000
+			log : preparing...
+			log : finished
+			Step No : 1
+				log : Any log.
+				test variable : VariableA
+					result : Passed
+					actual : 0
+					expect : 0
+				result of test step : Passed
+					Passed : 1
+					Failed : 0
+			Step No : 2
+				test variable : VariableB
+					result : Failed
+					actual : 0
+					expect : 5
+				result of test step : Failed
+					Passed : 0
+					Failed : 1
+			Step No : 3
+				test variable : VariableC
+					result : Failed
+					actual : 0
+					expect : 10
+				test variable : VariableD
+					result : Failed
+					actual : 0
+					expect : 55
+				result of test step : Failed
+					Passed : 0
+					Failed : 2
+			log : tear down...
+			log : finished
+			result of test case : Failed
+				Passed : 1
+				Failed : 2
+		log : tear_down...
+		log : finished
+		result of test suite : Failed
+			Passed : 0
+			Failed : 2
+	result of test : Failed
+		Suite : 
+			Passed : 0
+			Failed : 2
+		Case : 
+			Passed : 0
+			Failed : 4
+Test end at 2023-09-17 22:03:18.352000
