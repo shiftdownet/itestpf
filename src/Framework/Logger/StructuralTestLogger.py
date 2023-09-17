@@ -81,7 +81,8 @@ class StructuralTestLogger(TestProgressMonitor):
             "command":"test_variable",
             "variable":variable_name,
             "actual":0,
-            "expect":expected_value
+            "expect":expected_value,
+            "result":result
         })
         return result
 

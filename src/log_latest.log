@@ -1,8 +1,8 @@
-Test start at 2023-09-17 22:03:18.306000
-	TestSuite : SWE5TST-SUITE-SAMPLE1 start at 2023-09-17 22:03:18.329000
+Test start at 2023-09-17 22:05:37.404000
+	TestSuite : SWE5TST-SUITE-SAMPLE1 start at 2023-09-17 22:05:37.429000
 		log : preparing...
 		log : finished
-		TestCase : SWE5TST-SAMPLE-00001 start at 2023-09-17 22:03:18.332000
+		TestCase : SWE5TST-SAMPLE-00001 start at 2023-09-17 22:05:37.431000
 			log : preparing...
 			log : finished
 			Step No : 1
@@ -39,7 +39,7 @@ Test start at 2023-09-17 22:03:18.306000
 			result of test case : Failed
 				Passed : 1
 				Failed : 2
-		TestCase : SWE5TST-SAMPLE-00001 start at 2023-09-17 22:03:18.346000
+		TestCase : SWE5TST-SAMPLE-00001 start at 2023-09-17 22:05:37.447000
 			log : preparing...
 			log : finished
 			Step No : 1
@@ -81,10 +81,10 @@ Test start at 2023-09-17 22:03:18.306000
 		result of test suite : Failed
 			Passed : 0
 			Failed : 2
-	TestSuite : SWE5TST-SUITE-SAMPLE1 start at 2023-09-17 22:03:18.349000
+	TestSuite : SWE5TST-SUITE-SAMPLE1 start at 2023-09-17 22:05:37.450000
 		log : preparing...
 		log : finished
-		TestCase : SWE5TST-SAMPLE-00001 start at 2023-09-17 22:03:18.349000
+		TestCase : SWE5TST-SAMPLE-00001 start at 2023-09-17 22:05:37.450000
 			log : preparing...
 			log : finished
 			Step No : 1
@@ -121,7 +121,7 @@ Test start at 2023-09-17 22:03:18.306000
 			result of test case : Failed
 				Passed : 1
 				Failed : 2
-		TestCase : SWE5TST-SAMPLE-00001 start at 2023-09-17 22:03:18.351000
+		TestCase : SWE5TST-SAMPLE-00001 start at 2023-09-17 22:05:37.452000
 			log : preparing...
 			log : finished
 			Step No : 1
@@ -170,4 +170,4 @@ Test start at 2023-09-17 22:03:18.306000
 		Case : 
 			Passed : 0
 			Failed : 4
-Test end at 2023-09-17 22:03:18.352000
+Test end at 2023-09-17 22:05:37.454000
