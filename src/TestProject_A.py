@@ -11,17 +11,18 @@ from Framework.Logger.ITestLogger import ITestLogger
 from Framework.Logger.YamlTestLogger import YamlTestLogger
 from Framework.Logger.XmlTestLogger import XmlTestLogger
 from Framework.Logger.TextTestLogger import TextTestLogger
+from Framework.Logger.JsonTestLogger import JsonTestLogger
 from Suites import *
 
 class TestProject(ITestProject):
     def logger(self) -> ITestLogger:
-        return YamlTestLogger()
-        # 以下も選択可能
+        return JsonTestLogger()
+        #return YamlTestLogger()
         #return XmlTestLogger()
         #return TextTestLogger()
 
     def log_filename(self) -> str:
-        return "./log_latest.yaml"
+        return "./log_latest.json"
         # ログファイルに日付を含める場合は以下
         #return './log_' + (datetime.datetime.now()).strftime('%Y%m%d_%H%M%S') + '.yaml'
     
@@ -34,6 +35,7 @@ class TestProject(ITestProject):
         #return CsPlusSimulator()
 
     def suites(self) -> Iterator:
+        yield Suite_Sample1()
         yield Suite_Sample1()
 
 if __name__ == "__main__": 

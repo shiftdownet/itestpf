@@ -1,47 +1,48 @@
 
-from Framework.TestPlant.ITestSystem import ITestSystem
-from Framework.Logger.ITestLogger import ITestLogger
-from Framework.TestSpec.ITestSuite import ITestSuite
-from Framework.TestSpec.ITestCase import ITestCase
 
-class XmlTestLogger(ITestLogger, ITestSystem):
+from Framework.Logger.StructuralTestLogger import StructuralTestLogger
+from Framework.ITestSuite import ITestSuite
+from Framework.ITestCase import ITestCase
+
+class XmlTestLogger(StructuralTestLogger):
+
     #--------------------------------------------------
     # ITestLogger
     #--------------------------------------------------
     def set_stream(self, stream) -> None:
-        self.stream = stream
+        super().set_stream(stream)
 
     def log(self, message: str) -> None:
-        pass
+        super().log(message)
 
     def start_test(self) -> None:
-        pass
+        super().start_test()
 
     def start_suite(self, suite: ITestSuite) -> None:
-        pass
+        super().start_suite(suite)
 
     def start_case(self, testcase: ITestCase) -> None:
-        pass
+        super().start_case(testcase)
 
     def start_step(self) -> None:
-        pass
+        super().start_step()
 
     def end_step(self) -> None:
-        pass
+        super().end_step()
 
     def end_case(self) -> None:
-        pass
+        super().end_case()
 
     def end_suite(self) -> None:
-        pass
+        super().end_suite()
 
     def end_test(self) -> None:
-        pass
+        raise NotImplementedError("XMLでダンプする実装がありません。")
 
     #--------------------------------------------------
     # ITestSystem
     #--------------------------------------------------
     def test_variable(self, variable_name, expected_value) -> bool:
+        super().test_variable(variable_name, expected_value)
         return True
 
-    

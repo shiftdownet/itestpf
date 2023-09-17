@@ -77,7 +77,8 @@ scale 0.8
 remove TestDriver
 remove TestCaseX
 remove TestSuiteX
-remove TestSpec
+remove ITestCase
+remove ITestSuite
 
 'skinparam groupInheritance 2
 Framework.Logger.ConcreteTestLogger -up[hidden]-- ITestLogger

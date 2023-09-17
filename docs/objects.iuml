@@ -87,11 +87,7 @@ class Framework.Logger.ConcreteTestLogger implements  Framework.TestPlant.ITestS
     ITestSystemを実装しているため\nテストシステムコールのタイミングでもロギングを行えます。
 }
 
-'#----------------------------------------------------
-'# TestSpec
-'#----------------------------------------------------
-
-interface Framework.TestSpec.ITestSuite $interface {
+interface Framework.ITestSuite $interface {
     + name() : str\n\t テストスイート名を返します
     + description() : str\n\t テストスイートの説明を返します
     + testcases() : Iterator[ITestCase]\n\t テストケースを生成し返すジェネレータです。
@@ -99,7 +95,7 @@ interface Framework.TestSpec.ITestSuite $interface {
     + tear_down() \n\t テストスイートの後処理を実施します
 }
 
-interface Framework.TestSpec.ITestCase $interface {
+interface Framework.ITestCase $interface {
     + name()  : str\n\t テストケース名を返します
     + description()  : str\n\t テストケースの説明を返します
     + prepare() \n\t テストケースの前処理を実施します
@@ -137,14 +133,14 @@ class TestProject_A implements Framework.ITestProject {
     ---
 }
 
-class Suites.TestSuiteX implements Framework.TestSpec.ITestSuite {
+class Suites.TestSuiteX implements Framework.ITestSuite {
     具体的なテストスイートです。
     テストスイートの数だけクラスを作成してください。
     ITestSuiteを実装することで、
     TestDriverからの実行が可能になります。
 }
 
-class Suites.Cases.TestCaseX implements Framework.TestSpec.ITestCase {
+class Suites.Cases.TestCaseX implements Framework.ITestCase {
     具体的なテストケースです。
     テストケースの数だけクラスを作成してください。
     ITestSuiteを実装することで、

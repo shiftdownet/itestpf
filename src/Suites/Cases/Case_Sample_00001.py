@@ -1,6 +1,6 @@
 
 from collections.abc import Iterator
-from Framework.TestSpec.ITestCase import *
+from Framework.ITestCase import *
 from Framework.TestPlantProvider import *
 
 class Case_Sample_00001(ITestCase):

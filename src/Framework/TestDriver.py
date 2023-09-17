@@ -1,7 +1,7 @@
 
 from typing import List
 from Framework.ITestProject import ITestProject
-from Framework.TestSpec.ITestSuite import ITestSuite
+from Framework.ITestSuite import ITestSuite
 from Framework.TestPlantProvider import TestPlantProvider
 
 class TestDriver():

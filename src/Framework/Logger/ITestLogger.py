@@ -1,7 +1,7 @@
 
 import abc
-from Framework.TestSpec.ITestSuite import ITestSuite
-from Framework.TestSpec.ITestCase import ITestCase
+from Framework.ITestSuite import ITestSuite
+from Framework.ITestCase import ITestCase
 
 class ITestLogger(metaclass=abc.ABCMeta):
 

@@ -2,8 +2,8 @@
 
 from Framework.TestPlant.ITestSystem import ITestSystem
 from Framework.Logger.ITestLogger import ITestLogger
-from Framework.TestSpec.ITestSuite import ITestSuite
-from Framework.TestSpec.ITestCase import ITestCase
+from Framework.ITestSuite import ITestSuite
+from Framework.ITestCase import ITestCase
 
 class TextTestLogger(ITestLogger, ITestSystem):
     #--------------------------------------------------

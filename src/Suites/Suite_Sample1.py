@@ -1,6 +1,6 @@
 
 from collections.abc import Iterator
-from Framework.TestSpec.ITestSuite import *
+from Framework.ITestSuite import *
 
 from Suites.Cases.Case_Sample_00001 import *
 

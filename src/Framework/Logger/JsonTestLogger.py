@@ -4,7 +4,9 @@ from Framework.Logger.StructuralTestLogger import StructuralTestLogger
 from Framework.ITestSuite import ITestSuite
 from Framework.ITestCase import ITestCase
 
-class YamlTestLogger(StructuralTestLogger):
+import json
+
+class JsonTestLogger(StructuralTestLogger):
 
     #--------------------------------------------------
     # ITestLogger
@@ -16,9 +18,11 @@ class YamlTestLogger(StructuralTestLogger):
         super().log(message)
 
     def start_test(self) -> None:
-        super().start_test()
+        self.stream.write("{\"test\": {\"suites\" : [")
+        self.suite_separator = ""
 
     def start_suite(self, suite: ITestSuite) -> None:
+        self.stream.write(self.suite_separator)
         super().start_suite(suite)
 
     def start_case(self, testcase: ITestCase) -> None:
@@ -34,10 +38,16 @@ class YamlTestLogger(StructuralTestLogger):
         super().end_case()
 
     def end_suite(self) -> None:
-        super().end_suite()
+        # まとめてすべてダンプするとメモリ消費が激しいことが想定されるので、
+        # スイート単位でダンプしていく
+        self.commands_target = None
+        self.stream.write( json.dumps(self.suite, indent=4, ensure_ascii=False) )
+        self.suite_separator = ","
 
     def end_test(self) -> None:
-        raise NotImplementedError("YAMLでダンプする実装がありません。")
+        self.stream.write("] } }")
+        # 最後にまとめてダンプする場合は、以下を有効にする＆他のメソッドはすべてスーパークラスの実装を使う
+        # self.stream.write( json.dumps(self.root, indent=4, ensure_ascii=False) )
 
     #--------------------------------------------------
     # ITestSystem
