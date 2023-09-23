@@ -7,32 +7,31 @@
     <script type="text/javascript" src="./html/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="./testlog.js"></script>
     <script>
+        // testlog.jsにテスト情報がない場合に埋め込む初期値
+        default_info = {
+            vehicle: "No data",
+            system: "No data",
+            phase: "No data",
+            report_version: "No data",
+            revision: "",
+            version: "No data",
+            tested_date: "No data",
+            tester: "No data",
+            tool: "No data"
+        }
+
         // 加算
         Handlebars.registerHelper("add", function (opr1, opr2) {
             return opr1 + opr2
         });
-        // スイート
-        Handlebars.registerHelper("suite_status", function (result) {
+        // 
+        Handlebars.registerHelper("passed_or_failed", function (result) {
             return {
-                Passed: "list-group-item list-group-item-action list-group-item-success",
-                Failed: "list-group-item list-group-item-action list-group-item-danger"
+                Passed: "list-group-item-success",
+                Failed: "list-group-item-danger"
             }[result]
         });
-        // ケース
-        Handlebars.registerHelper("testcase_status", function (result) {
-            return {
-                Passed: "list-group-item list-group-item-action list-group-item-success",
-                Failed: "list-group-item list-group-item-action list-group-item-danger"
-            }[result]
-        });
-        // ステップ群
-        Handlebars.registerHelper("steps_status", function (result) {
-            return {
-                Passed: "list-group-item list-group-item-action list-group-item-success",
-                Failed: "list-group-item list-group-item-action list-group-item-danger"
-            }[result]
-        });
-        // ステップ
+        // 
         Handlebars.registerHelper("step_status", function (result) {
             switch (result) {
                 case true:
@@ -40,17 +39,17 @@
                 case false:
                     return "list-group-item-danger"
                 default:
-                    return "list-group-item-light"
+                    return "list-group-item-info"
             }
             return
         });
 
         // ケースクリック時にテンプレートからログ生成
         function testcase_clicked(suite_name, testcase_name) {
-            suite = test_logs.test.suites.find((element) => element.suite == suite_name)
-            testcase = suite.testcases.find((element) => element.testcase == testcase_name)
             // まだ生成されていなければ生成する
             if ($("#entity_" + testcase_name).html() == "") {
+                suite = test_logs.test.suites.find((element) => element.suite == suite_name)
+                testcase = suite.testcases.find((element) => element.testcase == testcase_name)
                 generate("#template_testcase", "#entity_" + testcase_name, testcase)
             }
         }
@@ -66,64 +65,39 @@
         }
 
         window.onload = function () {
-            if ( typeof test_logs === "undefined" ) {
+            if (typeof test_logs === "undefined") {
+                generate("#entity_info", "#entity_info", default_info)
                 generate("#template_error", "#entity_summary", "ログファイルが見つかりません。")
                 generate("#template_error", "#entity_tests", "ログファイルが見つかりません。")
             } else {
-                generate("#template_summary", "#entity_summary", test_logs.result)
+                if (typeof test_logs.info === "undefined") {
+                    info = default_info
+                } else {
+                    info = test_logs.info
+                }
+                generate("#entity_info", "#entity_info", info)
+                generate("#entity_summary", "#entity_summary", test_logs.result)
                 generate("#template_tests", "#entity_tests", test_logs.test)
 
             }
         }
     </script>
+    <!-- テンプレート: エラーメッセージ -->
     <template type="text/x-handlebars-template" id="template_error">
         <div class="alert alert-danger alert-dismissible fade show small" role="alert">
             {{this}}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-    </template>
-    <!-- テンプレート: テストサマリー -->
-    <template type="text/x-handlebars-template" id="template_summary">
-        <h1></h1>
-        <div class="bd-example-snippet bd-code-snippet">
-            <div class="bd-example m-0 border-0">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col">Items</th>
-                            <th scope="col">Number of test suites</th>
-                            <th scope="col">Number of test cases</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row"><span class="badge bg-success">Passed</span></th>
-                            <td>{{suite.passed}}</td>
-                            <td>{{testcase.passed}}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row"><span class="badge bg-danger">Failed</span></th>
-                            <td>{{suite.failed}}</td>
-                            <td>{{testcase.failed}}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row"><span class="badge bg-dark">Total</span></th>
-                            <td>{{add suite.passed suite.failed}}</td>
-                            <td>{{add testcase.passed testcase.failed}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </div>
     </template>
     <!-- テンプレート: テストの一覧 -->
     <template type="text/x-handlebars-template" id="template_tests">
         {{#each suites}}
-        <div class="accordion" id="accordion_suite">
+        <div class="accordion">
             <div class="accordion-item list-group">
                 <h4 class="accordion-header sticky-top">
-                    <button class="fs-6 collapsed {{suite_status this.result.judge}}" type="button"
-                        data-bs-toggle="collapse" data-bs-target="#{{this.suite}}" aria-expanded="true"
+                    <button
+                        class="fs-6 collapsed list-group-item list-group-item-action {{passed_or_failed this.result.judge}}"
+                        type="button" data-bs-toggle="collapse" data-bs-target="#{{this.suite}}" aria-expanded="true"
                         aria-controls="{{this.suite}}">
                         <span class="h6">{{this.suite}}</span> <span class="badge bg-success ms-5 me-2">Passed</span>
                         {{this.result.passed}}
@@ -135,19 +109,20 @@
                 <div id="{{this.suite}}" class="accordion-collapse collapse">
                     <div class="accordion-body">
                         {{#each this.testcases}}
-                        <div class="accordion" id="accordion_test_of_{{this.testcase}}">
+                        <div class="accordion">
                             <div class="accordion-item">
                                 <h4 class="accordion-header sticky-top" style="top:40px;z-index:30"
                                     onclick="testcase_clicked('{{../suite}}','{{this.testcase}}')">
-                                    <button class="fs-6 collapsed {{testcase_status this.result.judge}}" type="button"
-                                        data-bs-toggle="collapse" data-bs-target="#{{this.testcase}}"
+                                    <button
+                                        class="fs-6 collapsed list-group-item list-group-item-action {{passed_or_failed this.result.judge}}"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#{{this.testcase}}"
                                         aria-expanded="true" aria-controls="{{this.testcase}}">
                                         <span class="h6">{{this.testcase}}</span><span
                                             class="badge bg-success ms-5 me-2">Passed</span>
                                         {{this.result.passed}} <span class="badge bg-danger ms-4 me-2">Failed</span>
                                         {{this.result.failed}} <span class="badge bg-dark ms-4 me-2">Total</span> {{add
                                         this.result.passed this.result.failed}}
-                                        <span class="small ms-4">{{this.description}}</span>
+                                        <span class="small ms-2">{{this.description}}</span>
                                     </button>
                                 </h4>
                                 <div id="{{this.testcase}}" class="accordion-collapse collapse">
@@ -166,13 +141,51 @@
     </template>
     <!-- テンプレート: テストログ -->
     <template type="text/x-handlebars-template" id="template_testcase">
-        {{#each steps}}
-        <div class="accordion" id="accordion_detail_test_of_{{../testcase}}">
+        {{#with prepare}}
+        <div class="accordion">
             <div class="accordion-item">
                 <h4 class="accordion-header sticky-top" style="top:80px;z-index:20">
-                    <button class="fs-6 collapsed show {{steps_status this.result.judge}}" type="button"
-                        data-bs-toggle="collapse" data-bs-target="#datailed_{{../testcase}}_step{{this.step}}"
-                        aria-expanded="true" aria-controls="datailed_{{../testcase}}_step{{this.step}}">
+                    <button class="fs-6 list-group-item list-group-item-action" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#datailed_{{../testcase}}_prepare" aria-expanded="true"
+                        aria-controls="datailed_{{../testcase}}_prepare">
+                        <span class="h6">Prepare</span>
+                    </button>
+                </h4>
+                <div id="datailed_{{../testcase}}_prepare" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="bd-example m-0 border-0">
+                            <div class="list-group" style="z-index: 10;">
+                                {{#each this.commands}}
+                                <span class="list-group-item {{step_status this.result}} text-nowrap">
+                                    {{#if this.message}}
+                                    {{this.message}}
+                                    {{/if}}
+                                    {{#if this.expect includeZero=true}}
+                                    <span class="font-monospace">
+                                        {{this.variable}}<br>
+                                        <span class="badge rounded-pill bg-primary mx-1">Expect</span><span
+                                            class="small text-secondary">{{this.expect}}</span><br>
+                                        <span class="badge rounded-pill bg-info mx-1">Actual</span><span
+                                            class="small text-primary">{{this.actual}}</span><br>
+                                    </span>
+                                    {{/if}}
+                                </span>
+                                {{/each}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/with}}
+        {{#each steps}}
+        <div class="accordion">
+            <div class="accordion-item">
+                <h4 class="accordion-header sticky-top" style="top:80px;z-index:20">
+                    <button class="fs-6 list-group-item list-group-item-action {{passed_or_failed this.result.judge}}"
+                        type="button" data-bs-toggle="collapse"
+                        data-bs-target="#datailed_{{../testcase}}_step{{this.step}}" aria-expanded="true"
+                        aria-controls="datailed_{{../testcase}}_step{{this.step}}">
                         <span class="h6">Step {{this.step}}</span>
                         <span class="badge bg-success ms-5 me-2">Passed</span>
                         {{this.result.passed}} <span class="badge bg-danger ms-4 me-2">Failed</span>
@@ -181,27 +194,24 @@
                         <span class="small ms-4">{{this.description}}</span>
                     </button>
                 </h4>
-                <div id="datailed_{{../testcase}}_step{{this.step}}" class="accordion-collapse collapse show">
+                <div id="datailed_{{../testcase}}_step{{this.step}}" class="accordion-collapse collapse">
                     <div class="accordion-body">
                         <div class="bd-example m-0 border-0">
                             <div class="list-group" style="z-index: 10;">
                                 {{#each this.commands}}
-                                <span class="list-group-item  {{step_status this.result}} text-nowrap">
+                                <span class="list-group-item {{step_status this.result}} text-nowrap">
                                     {{#if this.message}}
                                     {{this.message}}
                                     {{/if}}
                                     {{#if this.expect includeZero=true}}
                                     <span class="font-monospace">
-                                    Test target: {{this.variable}}<br>
-                                    <span class="badge rounded-pill bg-primary mx-1">Expect</span><span class="small">{{this.expect}}</span><br>
-                                    <span class="badge rounded-pill bg-info mx-1">Actual</span><span class="small">{{this.actual}}</span><br>
+                                        {{this.variable}}<br>
+                                        <span class="badge rounded-pill bg-primary mx-1">Expect</span><span
+                                            class="small text-secondary">{{this.expect}}</span><br>
+                                        <span class="badge rounded-pill bg-info mx-1">Actual</span><span
+                                            class="small text-primary">{{this.actual}}</span><br>
                                     </span>
                                     {{/if}}
-                                    <!--
-                                    {{#each this}}
-                                        {{@key}} : {{this}}<br>
-                                    {{/each}}
-                                    -->
                                 </span>
                                 {{/each}}
                             </div>
@@ -211,14 +221,130 @@
             </div>
         </div>
         {{/each}}
+        {{#with tear_down}}
+        <div class="accordion">
+            <div class="accordion-item">
+                <h4 class="accordion-header sticky-top" style="top:80px;z-index:20">
+                    <button class="fs-6  list-group-item list-group-item-action" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#datailed_{{../testcase}}_tear_down" aria-expanded="true"
+                        aria-controls="datailed_{{../testcase}}_tear_down">
+                        <span class="h6">Tear down</span>
+                    </button>
+                </h4>
+                <div id="datailed_{{../testcase}}_tear_down" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="bd-example m-0 border-0">
+                            <div class="list-group" style="z-index: 10;">
+                                {{#each this.commands}}
+                                <span class="list-group-item {{step_status this.result}} text-nowrap">
+                                    {{#if this.message}}
+                                    {{this.message}}
+                                    {{/if}}
+                                    {{#if this.expect includeZero=true}}
+                                    <span class="font-monospace">
+                                        {{this.variable}}<br>
+                                        <span class="badge rounded-pill bg-primary mx-1">Expect</span><span
+                                            class="small text-secondary">{{this.expect}}</span><br>
+                                        <span class="badge rounded-pill bg-info mx-1">Actual</span><span
+                                            class="small text-primary">{{this.actual}}</span><br>
+                                    </span>
+                                    {{/if}}
+                                </span>
+                                {{/each}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/with}}
     </template>
 </head>
 
-<body>
-    <h2>Summary</h2>
-    <div id="entity_summary"></div>
-    <h2>All tests</h2>
-    <div id="entity_tests"></div>
+<body class="px-2">
+    <h1>Integration Test Report</h1>
+    <h2 class="border-bottom border-5 border-secondary">1. Information</h2>
+    <div id="entity_info" class="px-2">
+        <table class="table table-striped w-50">
+            <thead>
+                <tr>
+                    <th scope="col">Items</th>
+                    <th scope="col">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">Vehicle</th>
+                    <td>{{vehicle}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">System</th>
+                    <td>{{system}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Phase</th>
+                    <td>{{phase}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Report version</th>
+                    <td>{{report_version}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Software version</th>
+                    <td>
+                        {{#if revision}}
+                        Rev.{{revision}}
+                        {{else}}
+                        {{version}}
+                        {{/if}}
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Tested Date</th>
+                    <td>{{tested_date}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Tester</th>
+                    <td>{{tester}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Testing tool</th>
+                    <td>{{tool}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h2 class="border-bottom border-5 border-secondary">2. Summary</h2>
+    <div id="entity_summary" class="px-2">
+        <table class="table table-striped w-50">
+            <thead>
+                <tr>
+                    <th scope="col">Items</th>
+                    <th scope="col">Number of test suites</th>
+                    <th scope="col">Number of test cases</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row"><span class="badge bg-success">Passed</span></th>
+                    <td>{{suite.passed}}</td>
+                    <td>{{testcase.passed}}</td>
+                </tr>
+                <tr>
+                    <th scope="row"><span class="badge bg-danger">Failed</span></th>
+                    <td>{{suite.failed}}</td>
+                    <td>{{testcase.failed}}</td>
+                </tr>
+                <tr>
+                    <th scope="row"><span class="badge bg-dark">Total</span></th>
+                    <td>{{add suite.passed suite.failed}}</td>
+                    <td>{{add testcase.passed testcase.failed}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h2 class="border-bottom border-5 border-secondary">3. All tests</h2>
+    <div id="entity_tests" class="px-2"><!-- テンプレートから生成 --></div>
 </body>
 
 </html>
