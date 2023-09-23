@@ -15,8 +15,8 @@ from Suites import *
 class TestProject(ITestProject):
     def logger(self) -> ITestLogger:
         # ロガー形式を指定
-        #return JsonTestLogger() # 標準で使えるのがjsonパーサったのでjsonは実装
-        return TextTestLogger()
+        return JsonTestLogger() # 標準で使えるのがjsonパーサったのでjsonは実装
+        #return TextTestLogger()
 
     def log_filename(self) -> str:
         return "./log_latest.log"
@@ -35,8 +35,49 @@ class TestProject(ITestProject):
     def suites(self) -> Iterator:
         # ここにテストスイートを次々に追加していく
         yield Suite_Sample1()
-        yield Suite_Sample1() # デバッグのため同じスイートを2回
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
+        yield Suite_Sample1()
 
 if __name__ == "__main__": 
     TestDriver().launch( TestProject() )
 
+    # Jsonのログをjsに変換
+    from pathlib import Path
+    src_path = Path(TestProject().log_filename())
+    dst_path = Path("./testlog.js")
+    stream = src_path.read_text(encoding=TestProject().log_encoding())
+    stream = 'test_logs = ' + stream
+    dst_path.write_text(stream, encoding=TestProject().log_encoding())

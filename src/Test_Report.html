@@ -1,0 +1,224 @@
+<html>
+
+<head>
+    <link href="./html/css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" src="./html/js/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="./html/js/handlebars.min-v4.7.8.js"></script>
+    <script type="text/javascript" src="./html/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="./testlog.js"></script>
+    <script>
+        // 加算
+        Handlebars.registerHelper("add", function (opr1, opr2) {
+            return opr1 + opr2
+        });
+        // スイート
+        Handlebars.registerHelper("suite_status", function (result) {
+            return {
+                Passed: "list-group-item list-group-item-action list-group-item-success",
+                Failed: "list-group-item list-group-item-action list-group-item-danger"
+            }[result]
+        });
+        // ケース
+        Handlebars.registerHelper("testcase_status", function (result) {
+            return {
+                Passed: "list-group-item list-group-item-action list-group-item-success",
+                Failed: "list-group-item list-group-item-action list-group-item-danger"
+            }[result]
+        });
+        // ステップ群
+        Handlebars.registerHelper("steps_status", function (result) {
+            return {
+                Passed: "list-group-item list-group-item-action list-group-item-success",
+                Failed: "list-group-item list-group-item-action list-group-item-danger"
+            }[result]
+        });
+        // ステップ
+        Handlebars.registerHelper("step_status", function (result) {
+            switch (result) {
+                case true:
+                    return "list-group-item-success"
+                case false:
+                    return "list-group-item-danger"
+                default:
+                    return "list-group-item-light"
+            }
+            return
+        });
+
+        // ケースクリック時にテンプレートからログ生成
+        function testcase_clicked(suite_name, testcase_name) {
+            suite = test_logs.test.suites.find((element) => element.suite == suite_name)
+            testcase = suite.testcases.find((element) => element.testcase == testcase_name)
+            // まだ生成されていなければ生成する
+            if ($("#entity_" + testcase_name).html() == "") {
+                generate("#template_testcase", "#entity_" + testcase_name, testcase)
+            }
+        }
+
+        // Handlebars生成
+        // Args:
+        //    template    : 利用するテンプレート
+        //    destination : 描画先
+        //    data_source : 埋め込むデータ
+        function generate(template, destination, data_source) {
+            var compiled_template = Handlebars.compile($(template).html());
+            $(destination).html(compiled_template(data_source));
+        }
+
+        window.onload = function () {
+            if ( typeof test_logs === "undefined" ) {
+                generate("#template_error", "#entity_summary", "ログファイルが見つかりません。")
+                generate("#template_error", "#entity_tests", "ログファイルが見つかりません。")
+            } else {
+                generate("#template_summary", "#entity_summary", test_logs.result)
+                generate("#template_tests", "#entity_tests", test_logs.test)
+
+            }
+        }
+    </script>
+    <template type="text/x-handlebars-template" id="template_error">
+        <div class="alert alert-danger alert-dismissible fade show small" role="alert">
+            {{this}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+    </template>
+    <!-- テンプレート: テストサマリー -->
+    <template type="text/x-handlebars-template" id="template_summary">
+        <h1></h1>
+        <div class="bd-example-snippet bd-code-snippet">
+            <div class="bd-example m-0 border-0">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Items</th>
+                            <th scope="col">Number of test suites</th>
+                            <th scope="col">Number of test cases</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row"><span class="badge bg-success">Passed</span></th>
+                            <td>{{suite.passed}}</td>
+                            <td>{{testcase.passed}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><span class="badge bg-danger">Failed</span></th>
+                            <td>{{suite.failed}}</td>
+                            <td>{{testcase.failed}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><span class="badge bg-dark">Total</span></th>
+                            <td>{{add suite.passed suite.failed}}</td>
+                            <td>{{add testcase.passed testcase.failed}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+    <!-- テンプレート: テストの一覧 -->
+    <template type="text/x-handlebars-template" id="template_tests">
+        {{#each suites}}
+        <div class="accordion" id="accordion_suite">
+            <div class="accordion-item list-group">
+                <h4 class="accordion-header sticky-top">
+                    <button class="fs-6 collapsed {{suite_status this.result.judge}}" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#{{this.suite}}" aria-expanded="true"
+                        aria-controls="{{this.suite}}">
+                        <span class="h6">{{this.suite}}</span> <span class="badge bg-success ms-5 me-2">Passed</span>
+                        {{this.result.passed}}
+                        <span class="badge bg-danger ms-4 me-2">Failed</span> {{this.result.failed}} <span
+                            class="badge bg-dark ms-4 me-2">Total</span> {{add this.result.passed this.result.failed}}
+                        <span class="small">{{this.description}}</span>
+                    </button>
+                </h4>
+                <div id="{{this.suite}}" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        {{#each this.testcases}}
+                        <div class="accordion" id="accordion_test_of_{{this.testcase}}">
+                            <div class="accordion-item">
+                                <h4 class="accordion-header sticky-top" style="top:40px;z-index:30"
+                                    onclick="testcase_clicked('{{../suite}}','{{this.testcase}}')">
+                                    <button class="fs-6 collapsed {{testcase_status this.result.judge}}" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#{{this.testcase}}"
+                                        aria-expanded="true" aria-controls="{{this.testcase}}">
+                                        <span class="h6">{{this.testcase}}</span><span
+                                            class="badge bg-success ms-5 me-2">Passed</span>
+                                        {{this.result.passed}} <span class="badge bg-danger ms-4 me-2">Failed</span>
+                                        {{this.result.failed}} <span class="badge bg-dark ms-4 me-2">Total</span> {{add
+                                        this.result.passed this.result.failed}}
+                                        <span class="small ms-4">{{this.description}}</span>
+                                    </button>
+                                </h4>
+                                <div id="{{this.testcase}}" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <div id="entity_{{this.testcase}}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </template>
+    <!-- テンプレート: テストログ -->
+    <template type="text/x-handlebars-template" id="template_testcase">
+        {{#each steps}}
+        <div class="accordion" id="accordion_detail_test_of_{{../testcase}}">
+            <div class="accordion-item">
+                <h4 class="accordion-header sticky-top" style="top:80px;z-index:20">
+                    <button class="fs-6 collapsed show {{steps_status this.result.judge}}" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#datailed_{{../testcase}}_step{{this.step}}"
+                        aria-expanded="true" aria-controls="datailed_{{../testcase}}_step{{this.step}}">
+                        <span class="h6">Step {{this.step}}</span>
+                        <span class="badge bg-success ms-5 me-2">Passed</span>
+                        {{this.result.passed}} <span class="badge bg-danger ms-4 me-2">Failed</span>
+                        {{this.result.failed}} <span class="badge bg-dark ms-4 me-2">Total</span> {{add
+                        this.result.passed this.result.failed}}
+                        <span class="small ms-4">{{this.description}}</span>
+                    </button>
+                </h4>
+                <div id="datailed_{{../testcase}}_step{{this.step}}" class="accordion-collapse collapse show">
+                    <div class="accordion-body">
+                        <div class="bd-example m-0 border-0">
+                            <div class="list-group" style="z-index: 10;">
+                                {{#each this.commands}}
+                                <span class="list-group-item  {{step_status this.result}} text-nowrap">
+                                    {{#if this.message}}
+                                    {{this.message}}
+                                    {{/if}}
+                                    {{#if this.expect includeZero=true}}
+                                    <span class="font-monospace">
+                                    Test target: {{this.variable}}<br>
+                                    <span class="badge rounded-pill bg-primary mx-1">Expect</span><span class="small">{{this.expect}}</span><br>
+                                    <span class="badge rounded-pill bg-info mx-1">Actual</span><span class="small">{{this.actual}}</span><br>
+                                    </span>
+                                    {{/if}}
+                                    <!--
+                                    {{#each this}}
+                                        {{@key}} : {{this}}<br>
+                                    {{/each}}
+                                    -->
+                                </span>
+                                {{/each}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </template>
+</head>
+
+<body>
+    <h2>Summary</h2>
+    <div id="entity_summary"></div>
+    <h2>All tests</h2>
+    <div id="entity_tests"></div>
+</body>
+
+</html>
