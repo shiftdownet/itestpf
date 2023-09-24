@@ -68,8 +68,8 @@
             if (typeof test_logs === "undefined") {
                 generate("#entity_test_result", "#entity_test_result", null)
                 generate("#entity_info", "#entity_info", default_info)
-                generate("#template_error", "#entity_summary", "ログファイルが見つかりません。")
-                generate("#template_error", "#entity_tests", "ログファイルが見つかりません。")
+                generate("#template_error", "#entity_summary", "ログファイルが見つかりません。本テストレポートと同一階層に、testlog.jsonを配置してください。")
+                generate("#template_error", "#entity_tests", "ログファイルが見つかりません。本テストレポートと同一階層に、testlog.jsonを配置してください。")
             } else {
                 if (typeof test_logs.info === "undefined") {
                     info = default_info
